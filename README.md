@@ -1,7 +1,3 @@
-<p align="center">
-  <img src="src-tauri/icons/icon.png" width="120" alt="ADBA Logo">
-</p>
-
 <h1 align="center">ADBA</h1>
 <h3 align="center">Android Database Application</h3>
 
@@ -10,6 +6,7 @@
 </p>
 
 <p align="center">
+  <a href="#concept">Concept</a> |
   <a href="#how-it-works">How it Works</a> |
   <a href="#quick-start">Quick Start</a> |
   <a href="#api">API</a>
@@ -17,28 +14,61 @@
 
 ---
 
+## Concept
+
+```mermaid
+flowchart TB
+    subgraph Phone["YOUR ANDROID PHONE"]
+        ADBA["ADBA App"]
+        DB[(Database)]
+        ADBA --> DB
+    end
+    
+    subgraph Same["SAME DEVICE"]
+        App1["App 1"]
+        App2["App 2"]
+    end
+    
+    subgraph Network["SAME WIFI NETWORK"]
+        Laptop["Laptop"]
+        Tablet["Tablet"]
+        OtherPhone["Other Phone"]
+    end
+    
+    App1 -.->|localhost| ADBA
+    App2 -.->|localhost| ADBA
+    Laptop -.->|WiFi| ADBA
+    Tablet -.->|WiFi| ADBA
+    OtherPhone -.->|WiFi| ADBA
+```
+
+> **One phone = One database server**  
+> Any app (local or on network) can store and query data
+
+---
+
 ## How it Works
 
 ```mermaid
 flowchart LR
-    subgraph LAN["Local Network"]
-        PC["PC"]
-        Tablet["Tablet"]
-        Other["Other Apps"]
+    subgraph Clients["Any Client"]
+        C1["Local App"]
+        C2["PC Browser"]
+        C3["Other Device"]
     end
     
-    subgraph Android["ADBA Server"]
-        API["REST API"]
+    subgraph ADBA["ADBA Server"]
+        API["REST API :8080"]
         SQLite[(SQLite)]
+        mDNS["Auto-Discovery"]
     end
     
-    PC -->|HTTP| API
-    Tablet -->|HTTP| API
-    Other -->|HTTP| API
+    C1 -->|HTTP| API
+    C2 -->|HTTP| API
+    C3 -->|HTTP| API
     API --> SQLite
+    mDNS -.->|Broadcast| Clients
 ```
-
-> Any device on your network can query the database via REST API
 
 ---
 
@@ -47,18 +77,18 @@ flowchart LR
 ```mermaid
 flowchart TB
     subgraph Frontend["React Dashboard"]
-        UI["Status & Controls"]
+        UI["Status and Controls"]
     end
     
     subgraph Backend["Rust Backend"]
         Server["Axum REST"]
         DB["SQLite Engine"]
-        mDNS["LAN Discovery"]
+        Discovery["LAN Discovery"]
     end
     
     UI --> Server
     Server --> DB
-    Server --> mDNS
+    Server --> Discovery
 ```
 
 ---
