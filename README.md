@@ -1,58 +1,124 @@
-# ADBA - Android Database Application
+<p align="center">
+  <img src="src-tauri/icons/icon.png" width="120" alt="ADBA Logo">
+</p>
 
-Application Android servant de serveur de base de données local, accessible sur le réseau LAN.
+<h1 align="center">ADBA</h1>
+<h3 align="center">Android Database Application</h3>
 
-## 🚀 Développement
+<p align="center">
+  <strong>Turn your Android phone into a local database server</strong>
+</p>
 
-### Prérequis locaux
-- Node.js 18+
-- Rust (rustup)
-- **Pas besoin d'Android Studio** - les builds se font via GitHub Actions
+<p align="center">
+  <a href="#how-it-works">How it Works</a> •
+  <a href="#quick-start">Quick Start</a> •
+  <a href="#api">API</a>
+</p>
 
-### Commandes
+---
+
+## How it Works
+
+```mermaid
+flowchart LR
+    subgraph LAN["📶 Local Network"]
+        PC["💻 PC"]
+        Tablet["📱 Tablet"]
+        Other["🖥️ Other Apps"]
+    end
+    
+    subgraph Android["📱 ADBA Server"]
+        API["REST API"]
+        SQLite[(SQLite)]
+    end
+    
+    PC -->|HTTP| API
+    Tablet -->|HTTP| API
+    Other -->|HTTP| API
+    API --> SQLite
+```
+
+> **Any device on your network can query the database via REST API**
+
+---
+
+## Architecture
+
+```mermaid
+flowchart TB
+    subgraph Frontend["React Dashboard"]
+        UI["📊 Status & Controls"]
+    end
+    
+    subgraph Backend["Rust Backend"]
+        Server["🌐 Axum REST"]
+        DB["🗄️ SQLite Engine"]
+        mDNS["📡 LAN Discovery"]
+    end
+    
+    UI --> Server
+    Server --> DB
+    Server --> mDNS
+```
+
+---
+
+## Quick Start
 
 ```bash
-# Installation des dépendances
+# Clone
+git clone https://github.com/Garletz/ADBA-ANDROIDATABASE.git
+cd ADBA-ANDROIDATABASE
+
+# Install
 npm install
 
-# Développement desktop (pour tester la logique)
+# Dev (desktop)
 npm run tauri dev
-
-# Le build Android se fait automatiquement sur GitHub (voir ci-dessous)
 ```
 
-## 📱 Build Android (Cloud)
+### 📱 Android APK
+> Built automatically via GitHub Actions  
+> Download from [Actions → Artifacts](../../actions)
 
-Les APK sont compilés automatiquement via **GitHub Actions** :
+---
 
-1. **Push** votre code sur GitHub (branch `main` ou `master`)
-2. Le workflow se lance automatiquement
-3. Téléchargez l'APK depuis l'onglet **Actions** → **Artifacts**
+## API
 
-Ou lancez manuellement : **Actions** → **Build Android APK** → **Run workflow**
+| Endpoint | Method | Description |
+|:---------|:------:|:------------|
+| `/api/status` | GET | Server status |
+| `/api/databases` | GET | List all DBs |
+| `/api/databases` | POST | Create DB |
+| `/api/query` | POST | Execute SQL |
+| `/api/pairing-code` | GET | Get connection code |
 
-## 🏗️ Architecture
+### Example
 
+```bash
+# Create database
+curl -X POST http://PHONE_IP:8080/api/databases \
+  -d '{"name": "myapp", "client_app": "MyApp"}'
+
+# Query
+curl -X POST http://PHONE_IP:8080/api/query \
+  -d '{"database": "myapp", "query": "SELECT * FROM users", "pairing_code": "XXXX"}'
 ```
-ADBA/
-├── src/                  # Frontend React
-├── src-tauri/
-│   ├── src/
-│   │   ├── lib.rs        # Entry point Tauri
-│   │   ├── database.rs   # SQLite engine
-│   │   ├── server.rs     # REST API (axum)
-│   │   ├── discovery.rs  # mDNS LAN
-│   │   ├── state.rs      # App state
-│   │   └── error.rs      # Error types
-│   └── Cargo.toml
-└── .github/workflows/    # CI/CD
-```
 
-## 📡 API REST
+---
 
-| Endpoint | Méthode | Description |
-|----------|---------|-------------|
-| `/api/status` | GET | État du serveur |
-| `/api/databases` | GET/POST | Liste/Créer DB |
-| `/api/query` | POST | Exécuter SQL |
-| `/api/pairing-code` | GET/POST | Code d'appairage |
+## Tech Stack
+
+| Component | Technology |
+|:----------|:-----------|
+| Backend | Rust + Tauri |
+| Database | SQLite (rusqlite) |
+| API | Axum |
+| Frontend | React + TypeScript |
+| Discovery | mDNS |
+
+---
+
+<p align="center">
+  <sub>Made with ❤️ for offline-first apps</sub>
+</p>
