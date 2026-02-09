@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="src-tauri/icons/logo.png" width="180" alt="ADBA Logo">
+  <img src="src-tauri/icons/logo.png" width="360" alt="ADBA Logo">
 </p>
 
 <h1 align="center">ADBA</h1>
