@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="src-tauri/icons/logo.png" width="180" alt="ADBA Logo">
+</p>
+
 <h1 align="center">ADBA</h1>
 <h3 align="center">Android Database Application</h3>
 
