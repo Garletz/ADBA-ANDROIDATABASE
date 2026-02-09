@@ -10,8 +10,8 @@
 </p>
 
 <p align="center">
-  <a href="#how-it-works">How it Works</a> •
-  <a href="#quick-start">Quick Start</a> •
+  <a href="#how-it-works">How it Works</a> |
+  <a href="#quick-start">Quick Start</a> |
   <a href="#api">API</a>
 </p>
 
@@ -21,13 +21,13 @@
 
 ```mermaid
 flowchart LR
-    subgraph LAN["📶 Local Network"]
-        PC["💻 PC"]
-        Tablet["📱 Tablet"]
-        Other["🖥️ Other Apps"]
+    subgraph LAN["Local Network"]
+        PC["PC"]
+        Tablet["Tablet"]
+        Other["Other Apps"]
     end
     
-    subgraph Android["📱 ADBA Server"]
+    subgraph Android["ADBA Server"]
         API["REST API"]
         SQLite[(SQLite)]
     end
@@ -38,7 +38,7 @@ flowchart LR
     API --> SQLite
 ```
 
-> **Any device on your network can query the database via REST API**
+> Any device on your network can query the database via REST API
 
 ---
 
@@ -47,13 +47,13 @@ flowchart LR
 ```mermaid
 flowchart TB
     subgraph Frontend["React Dashboard"]
-        UI["📊 Status & Controls"]
+        UI["Status & Controls"]
     end
     
     subgraph Backend["Rust Backend"]
-        Server["🌐 Axum REST"]
-        DB["🗄️ SQLite Engine"]
-        mDNS["📡 LAN Discovery"]
+        Server["Axum REST"]
+        DB["SQLite Engine"]
+        mDNS["LAN Discovery"]
     end
     
     UI --> Server
@@ -77,9 +77,9 @@ npm install
 npm run tauri dev
 ```
 
-### 📱 Android APK
+### Android APK
 > Built automatically via GitHub Actions  
-> Download from [Actions → Artifacts](../../actions)
+> Download from [Actions > Artifacts](../../actions)
 
 ---
 
@@ -120,5 +120,5 @@ curl -X POST http://PHONE_IP:8080/api/query \
 ---
 
 <p align="center">
-  <sub>Made with ❤️ for offline-first apps</sub>
+  <sub>Made for offline-first apps</sub>
 </p>
