@@ -13,49 +13,53 @@ const SERVICE_NAME: &str = "ADBA Database Server";
 
 /// Register ADBA as an mDNS service on the local network
 pub fn register_service(port: u16, pairing_code: &str) -> Result<(), AdbaError> {
-    // Create mDNS daemon
-    let mdns = ServiceDaemon::new()
-        .map_err(|e| AdbaError::Discovery(format!("Failed to create mDNS daemon: {}", e)))?;
+    #[cfg(not(target_os = "android"))]
+    {
+        // Create mDNS daemon
+        let mdns = ServiceDaemon::new()
+            .map_err(|e| AdbaError::Discovery(format!("Failed to create mDNS daemon: {}", e)))?;
+        
+        // Get hostname
+        let hostname = hostname::get()
+            .map(|h| h.to_string_lossy().to_string())
+            .unwrap_or_else(|_| "adba-host".to_string());
+        
+        let instance_name = format!("{}-{}", SERVICE_NAME, &pairing_code[..4]);
+        
+        // Create service properties
+        let mut properties = HashMap::new();
+        properties.insert("version".to_string(), "0.1.0".to_string());
+        properties.insert("protocol".to_string(), "rest".to_string());
+        properties.insert("pairing_prefix".to_string(), pairing_code[..2].to_string());
+        
+        // Create service info
+        let service = ServiceInfo::new(
+            SERVICE_TYPE,
+            &instance_name,
+            &format!("{}.local.", hostname),
+            "",  // Will use default IP
+            port,
+            properties,
+        ).map_err(|e| AdbaError::Discovery(format!("Failed to create service info: {}", e)))?;
+        
+        // Register the service
+        mdns.register(service)
+            .map_err(|e| AdbaError::Discovery(format!("Failed to register mDNS service: {}", e)))?;
+        
+        info!(
+            "Registered mDNS service '{}' on port {} (pairing prefix: {})",
+            instance_name, port, &pairing_code[..2]
+        );
+        
+        // Keep the daemon alive by leaking it (no infinite thread needed)
+        std::mem::forget(mdns);
+    }
     
-    // Get hostname
-    let hostname = hostname::get()
-        .map(|h| h.to_string_lossy().to_string())
-        .unwrap_or_else(|_| "adba-host".to_string());
-    
-    let instance_name = format!("{}-{}", SERVICE_NAME, &pairing_code[..4]);
-    
-    // Create service properties
-    let mut properties = HashMap::new();
-    properties.insert("version".to_string(), "0.1.0".to_string());
-    properties.insert("protocol".to_string(), "postgresql".to_string());
-    properties.insert("pairing_prefix".to_string(), pairing_code[..2].to_string());
-    
-    // Create service info
-    let service = ServiceInfo::new(
-        SERVICE_TYPE,
-        &instance_name,
-        &format!("{}.local.", hostname),
-        "",  // Will use default IP
-        port,
-        properties,
-    ).map_err(|e| AdbaError::Discovery(format!("Failed to create service info: {}", e)))?;
-    
-    // Register the service
-    mdns.register(service)
-        .map_err(|e| AdbaError::Discovery(format!("Failed to register mDNS service: {}", e)))?;
-    
-    info!(
-        "Registered mDNS service '{}' on port {} (pairing prefix: {})",
-        instance_name, port, &pairing_code[..2]
-    );
-    
-    // Keep the daemon alive by spawning a background task
-    std::thread::spawn(move || {
-        // The daemon needs to stay alive to maintain registration
-        loop {
-            std::thread::sleep(std::time::Duration::from_secs(60));
-        }
-    });
+    #[cfg(target_os = "android")]
+    {
+        info!("mDNS service discovery not available on Android (port: {})", port);
+        info!("Clients must connect manually using IP address and pairing code: {}", pairing_code);
+    }
     
     Ok(())
 }

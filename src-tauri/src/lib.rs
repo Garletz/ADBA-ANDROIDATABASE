@@ -96,20 +96,20 @@ pub fn run() {
         .setup(|app| {
             let handle = app.handle().clone();
             
-            // Spawn async initialization
-            tauri::async_runtime::spawn(async move {
+            // Block on async initialization to ensure services are ready
+            tauri::async_runtime::block_on(async move {
                 match init_services(handle.clone()).await {
                     Ok(state) => {
                         handle.manage(state);
                         info!("ADBA services initialized successfully");
+                        Ok(())
                     }
                     Err(e) => {
                         tracing::error!("Failed to initialize services: {}", e);
+                        Err(Box::new(e) as Box<dyn std::error::Error>)
                     }
                 }
-            });
-            
-            Ok(())
+            })
         })
         .invoke_handler(tauri::generate_handler![
             get_status,

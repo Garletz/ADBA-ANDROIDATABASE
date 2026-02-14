@@ -309,8 +309,15 @@ impl DatabaseEngine {
 fn get_data_directory() -> PathBuf {
     #[cfg(target_os = "android")]
     {
-        // Android internal storage
-        PathBuf::from("/data/data/com.administrateur.adba/databases")
+        // On Android, use the app's internal storage directory
+        // This is typically /data/data/PACKAGE_ID/files
+        // We'll use a fallback path that works with Tauri
+        if let Ok(data_dir) = std::env::var("ANDROID_DATA") {
+            PathBuf::from(data_dir).join("adba").join("databases")
+        } else {
+            // Fallback to a safe temporary location
+            PathBuf::from("/data/local/tmp/adba/databases")
+        }
     }
     
     #[cfg(not(target_os = "android"))]
