@@ -63,8 +63,8 @@ jobs:
       - name: Initialize Tauri Android
         run: cargo tauri android init
 
-      - name: Build Android APK (release)
-        run: cargo tauri android build
+      - name: Build Android APK (debug - auto-signed)
+        run: cargo tauri android build --debug
         env:
           ANDROID_SDK_ROOT: ${{ env.ANDROID_SDK_ROOT }}
           NDK_HOME: ${{ env.NDK_HOME }}
