@@ -5,6 +5,8 @@
 <h1 align="center">ADBA</h1>
 <h3 align="center">Android Database Application</h3>
 
+<h2 >SDK for universal integration device is not finished we are in negociation with some group process 2month exeptation</h2>
+
 <p align="center">
   <strong>Turn your Android phone into a local database server</strong>
 </p>
