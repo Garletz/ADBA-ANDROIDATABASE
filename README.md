@@ -1,4 +1,4 @@
-halted project not working its a poc we are waiting new rule of the new android realease coming in sept 2026
+<h1>halted project not working its a poc we are waiting new rule of the new android realease coming in sept 2026 </h1>
 
 <p align="center">
   <img src="src-tauri/icons/logo.png" width="360" alt="ADBA Logo">
